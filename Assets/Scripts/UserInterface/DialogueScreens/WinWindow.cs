@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.UserInterface.DialogueScreens
 {
-    public class WinWindow : DialogueWindow
+    public class WinWindow : GameResultWindow
     {
         public override DialogWindowID ID => DialogWindowID.Win;
     }

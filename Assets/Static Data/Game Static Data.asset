@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Game Static Data
   m_EditorClassIdentifier: 
   _encryptionCodeWord: CodeWord
+  _extraSecondsOnBuy: 10
   _gameScene: Game
   _gameScreensaverScene: GameScreensaver
   _initialScene: Initial
-  _saveFileName: Save.json
   _levelLabel:
     m_LabelString: GameLevel
+  _levelTotalSeconds: 120
+  _saveFileName: Save.json

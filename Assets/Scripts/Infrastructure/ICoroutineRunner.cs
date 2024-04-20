@@ -7,5 +7,11 @@ namespace Assets.Scripts.Infrastructure
     public interface ICoroutineRunner
     {
         Coroutine StartCoroutine(IEnumerator coroutine);
+
+        void StopCoroutine(string methodName);
+
+        void StopCoroutine(IEnumerator routine);
+
+        void StopCoroutine(Coroutine routine);
     }
 }

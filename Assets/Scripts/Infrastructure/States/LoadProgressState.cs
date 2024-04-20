@@ -50,7 +50,6 @@ namespace Assets.Scripts.Infrastructure.States
 
         private void OnSceneLoad()
         {
-            _gameUI.OpenScreen(ScreenID.Main);
             _stateMachine.Enter<PreGameLoopState>();
         }
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.UserInterface.DialogueScreens
 {
-    public class DefeatWindow : DialogueWindow
+    public class DefeatWindow : GameResultWindow
     {
         public override DialogWindowID ID => DialogWindowID.Defeat;
     }

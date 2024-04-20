@@ -3,6 +3,9 @@ using Assets.Scripts.Infrastructure.Services.UserInterface;
 using Assets.Scripts.Infrastructure.States;
 using Assets.Scripts.StaticData;
 using Assets.Scripts.UserInterface;
+using System.Threading.Tasks;
+using Unity.Services.Core;
+using Unity.Services.Core.Environments;
 using UnityEngine;
 
 namespace Assets.Scripts.Infrastructure
@@ -24,7 +27,7 @@ namespace Assets.Scripts.Infrastructure
             _serviceLocator = new ServiceLocator();
             _sceneLoader = new SceneLoader(coroutineRunner, gameStaticData);
             _stateMachine = new GameStateMachine(_sceneLoader, _serviceLocator);
-            _serviceInitializer = new ServiceInitializer(_serviceLocator, _stateMachine, gameStaticData, _sceneLoader);
+            _serviceInitializer = new ServiceInitializer(_serviceLocator, _stateMachine, gameStaticData, _sceneLoader, coroutineRunner);
         }
 
         ~Game()
