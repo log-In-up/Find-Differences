@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Infrastructure.AssetManagement;
 using Assets.Scripts.Infrastructure.Factory;
 using Assets.Scripts.Infrastructure.Services.UserInterface;
+using Assets.Scripts.Logic;
 using Assets.Scripts.UserInterface;
 
 namespace Assets.Scripts.Infrastructure.States
@@ -41,8 +42,8 @@ namespace Assets.Scripts.Infrastructure.States
 
         private void OnLoaded()
         {
-            _gameFactory.SpawnGameLevel(_payload);
-            _stateMachine.Enter<GameLoopState>();
+            LevelHandler levelHandler = _gameFactory.SpawnGameLevel(_payload);
+            _stateMachine.Enter<GameLoopState, LevelHandler>(levelHandler);
         }
     }
 }

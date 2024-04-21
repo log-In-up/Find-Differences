@@ -4,6 +4,7 @@ using Assets.Scripts.Infrastructure.Services;
 using Assets.Scripts.Infrastructure.Services.LevelTimer;
 using Assets.Scripts.Infrastructure.Services.PersistentProgress;
 using Assets.Scripts.Infrastructure.Services.SaveLoad;
+using Assets.Scripts.Infrastructure.Services.StaticData;
 using Assets.Scripts.Infrastructure.Services.UserInterface;
 using System;
 using System.Collections.Generic;
@@ -48,21 +49,20 @@ namespace Assets.Scripts.Infrastructure.States
         public void InitializeStateMashine()
         {
             IGameUI gameUI = _serviceLocator.GetService<IGameUI>();
+            ISaveLoadService saveLoadService = _serviceLocator.GetService<ISaveLoadService>();
+            IPersistentProgressService progressService = _serviceLocator.GetService<IPersistentProgressService>();
 
             _states = new Dictionary<Type, IExitableState>()
             {
-                [typeof(GameLoopState)] = new GameLoopState(this,
+                [typeof(GameLoopState)] = new GameLoopState(
                     _serviceLocator.GetService<IGameDialogUI>(),
                     gameUI,
                     _serviceLocator.GetService<ITimer>()),
                 [typeof(LoadLevelState)] = new LoadLevelState(this,
                     _serviceLocator.GetService<IGameFactory>(),
-                    gameUI,
-                    _sceneLoader),
-                [typeof(LoadProgressState)] = new LoadProgressState(this, gameUI,
-                    _serviceLocator.GetService<IPersistentProgressService>(),
-                    _serviceLocator.GetService<ISaveLoadService>(),
-                    _sceneLoader),
+                    gameUI, _sceneLoader),
+                [typeof(LoadProgressState)] = new LoadProgressState(this,
+                    gameUI, progressService, saveLoadService, _sceneLoader),
                 [typeof(PreGameLoopState)] = new PreGameLoopState(this, gameUI)
             };
         }

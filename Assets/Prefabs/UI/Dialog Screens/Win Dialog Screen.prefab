@@ -836,6 +836,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mainMenu: {fileID: 9157107667738753548}
   _restart: {fileID: 6386173674061044206}
+  _nextLevel: {fileID: 3413508912909415718}
 --- !u!1 &8371410285251870235
 GameObject:
   m_ObjectHideFlags: 0

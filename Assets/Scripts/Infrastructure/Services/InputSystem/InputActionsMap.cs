@@ -26,78 +26,6 @@ namespace Assets.Scripts.Infrastructure.Services.InputSystem
     ""name"": ""InputActionsMap"",
     ""maps"": [
         {
-            ""name"": ""Player"",
-            ""id"": ""fbfab6b9-8435-4f5b-8761-51696955214c"",
-            ""actions"": [
-                {
-                    ""name"": ""Fire"",
-                    ""type"": ""Value"",
-                    ""id"": ""9be2f4c1-cd73-4048-a3a0-e80ea40c12e8"",
-                    ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                }
-            ],
-            ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""c9864596-77f5-4ee4-b28d-cd3b1d4c58cc"",
-                    ""path"": ""<Gamepad>/rightTrigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""Fire"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""bb041ea6-7274-4dbc-832e-55fc99006f40"",
-                    ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard&Mouse;Keyboard and Mouse"",
-                    ""action"": ""Fire"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""17e3837e-b10b-418e-ba93-c3913ed535c9"",
-                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Touch"",
-                    ""action"": ""Fire"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""20e42adc-ac2c-4aa9-9096-ec3c0c83620f"",
-                    ""path"": ""<Joystick>/trigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Joystick"",
-                    ""action"": ""Fire"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""f1fcd48a-6f01-47fb-85b3-36ed753df874"",
-                    ""path"": ""<XRController>/{PrimaryAction}"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""XR"",
-                    ""action"": ""Fire"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                }
-            ]
-        },
-        {
             ""name"": ""UI"",
             ""id"": ""87d8cd7c-3719-4814-8e8a-77bb91dfdde9"",
             ""actions"": [
@@ -677,9 +605,6 @@ namespace Assets.Scripts.Infrastructure.Services.InputSystem
         }
     ]
 }");
-            // Player
-            m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
-            m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -749,52 +674,6 @@ namespace Assets.Scripts.Infrastructure.Services.InputSystem
         {
             return asset.FindBinding(bindingMask, out action);
         }
-
-        // Player
-        private readonly InputActionMap m_Player;
-        private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
-        private readonly InputAction m_Player_Fire;
-        public struct PlayerActions
-        {
-            private @InputActionsMap m_Wrapper;
-            public PlayerActions(@InputActionsMap wrapper) { m_Wrapper = wrapper; }
-            public InputAction @Fire => m_Wrapper.m_Player_Fire;
-            public InputActionMap Get() { return m_Wrapper.m_Player; }
-            public void Enable() { Get().Enable(); }
-            public void Disable() { Get().Disable(); }
-            public bool enabled => Get().enabled;
-            public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
-            public void AddCallbacks(IPlayerActions instance)
-            {
-                if (instance == null || m_Wrapper.m_PlayerActionsCallbackInterfaces.Contains(instance)) return;
-                m_Wrapper.m_PlayerActionsCallbackInterfaces.Add(instance);
-                @Fire.started += instance.OnFire;
-                @Fire.performed += instance.OnFire;
-                @Fire.canceled += instance.OnFire;
-            }
-
-            private void UnregisterCallbacks(IPlayerActions instance)
-            {
-                @Fire.started -= instance.OnFire;
-                @Fire.performed -= instance.OnFire;
-                @Fire.canceled -= instance.OnFire;
-            }
-
-            public void RemoveCallbacks(IPlayerActions instance)
-            {
-                if (m_Wrapper.m_PlayerActionsCallbackInterfaces.Remove(instance))
-                    UnregisterCallbacks(instance);
-            }
-
-            public void SetCallbacks(IPlayerActions instance)
-            {
-                foreach (var item in m_Wrapper.m_PlayerActionsCallbackInterfaces)
-                    UnregisterCallbacks(item);
-                m_Wrapper.m_PlayerActionsCallbackInterfaces.Clear();
-                AddCallbacks(instance);
-            }
-        }
-        public PlayerActions @Player => new PlayerActions(this);
 
         // UI
         private readonly InputActionMap m_UI;
@@ -957,10 +836,6 @@ namespace Assets.Scripts.Infrastructure.Services.InputSystem
                 if (m_XRSchemeIndex == -1) m_XRSchemeIndex = asset.FindControlSchemeIndex("XR");
                 return asset.controlSchemes[m_XRSchemeIndex];
             }
-        }
-        public interface IPlayerActions
-        {
-            void OnFire(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {

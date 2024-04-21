@@ -1,12 +1,17 @@
 using Assets.Scripts.Infrastructure.Services.InputSystem;
-using UnityEngine.InputSystem;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEditor.Progress;
 
 namespace Assets.Scripts.Logic
 {
     public class LevelHandler : MonoBehaviour
     {
+        [SerializeField]
+        private GameObject _findingEffect;
+
         [SerializeField]
         private LayerMask _layerMask;
 
@@ -14,6 +19,11 @@ namespace Assets.Scripts.Logic
         private List<GameObject> _topObjects, _bottomObjects;
 
         private InputActionsMap _actionsMap;
+        private List<(GameObject, GameObject)> _pair;
+
+        public delegate void FindHandler();
+
+        public event FindHandler OnAllObjectsFind;
 
         internal void SetBottomDifferences(int[] bottomImages)
         {
@@ -28,6 +38,50 @@ namespace Assets.Scripts.Logic
         private void Awake()
         {
             _actionsMap = new InputActionsMap();
+            _pair = new List<(GameObject, GameObject)>();
+        }
+
+        private void CachePairs()
+        {
+            for (int index = 0; index < _topObjects.Count; index++)
+            {
+                _pair.Add((_topObjects[index], _bottomObjects[index]));
+            }
+        }
+
+        private void DisableCollider(GameObject item)
+        {
+            if (item.TryGetComponent(out Collider collider))
+            {
+                collider.enabled = false;
+            }
+        }
+
+        private void DisableUnnecessaryColliders()
+        {
+            foreach ((GameObject, GameObject) item in _pair)
+            {
+                if (item.Item1.activeInHierarchy == item.Item2.activeInHierarchy)
+                {
+                    DisableCollider(item.Item1);
+                    DisableCollider(item.Item2);
+                }
+            }
+        }
+
+        private bool FindPair(GameObject objectOnScene, out (GameObject, GameObject) pair)
+        {
+            foreach ((GameObject, GameObject) item in _pair)
+            {
+                if (objectOnScene == item.Item1 || objectOnScene == item.Item2)
+                {
+                    pair = item;
+                    return true;
+                }
+            }
+
+            pair = new(null, null);
+            return false;
         }
 
         private void OnDisable()
@@ -39,7 +93,7 @@ namespace Assets.Scripts.Logic
         private void OnEnable()
         {
             _actionsMap.Enable();
-            _actionsMap.UI.Click.started += TapPerformed;
+            _actionsMap.UI.Click.performed += TapPerformed;
         }
 
         private void SetObjectsToBeHidden(List<GameObject> gameObjects, int[] images)
@@ -57,6 +111,12 @@ namespace Assets.Scripts.Logic
             }
         }
 
+        private void Start()
+        {
+            CachePairs();
+            DisableUnnecessaryColliders();
+        }
+
         private void TapPerformed(InputAction.CallbackContext callbackContext)
         {
             Vector2 position = _actionsMap.UI.Point.ReadValue<Vector2>();
@@ -64,14 +124,28 @@ namespace Assets.Scripts.Logic
 
             RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction, 25.0f, _layerMask);
 
-            if (hit.collider != null)
+            if (hit.collider != null && hit.collider.enabled && FindPair(hit.collider.gameObject, out (GameObject, GameObject) pair))
             {
-                Debug.LogWarning("Hit!");
+                Instantiate(_findingEffect, pair.Item1.transform.position, Quaternion.identity);
+                Instantiate(_findingEffect, pair.Item2.transform.position, Quaternion.identity);
+
+                hit.collider.gameObject.SetActive(false);
+
+                CheckAllItems();
             }
-            else
+        }
+
+        private void CheckAllItems()
+        {
+            foreach ((GameObject, GameObject) item in _pair)
             {
-                Debug.DrawLine(ray.origin, ray.origin + ray.direction * 100.0f, Color.red, 5.0f);
+                if (item.Item1.activeInHierarchy != item.Item2.activeInHierarchy)
+                {
+                    return;
+                }
             }
+
+            OnAllObjectsFind?.Invoke();
         }
     }
 }

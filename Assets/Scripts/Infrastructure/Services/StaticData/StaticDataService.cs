@@ -32,6 +32,14 @@ namespace Assets.Scripts.Infrastructure.Services.StaticData
             return _levelsCache[index];
         }
 
+        public uint GetNextLevelIndex(uint index)
+        {
+            //items[(index + 1) % items.Count];
+            LevelStaticData level = _levelsCache[(index + 1) % (uint)_levelsCache.Count];
+
+            return level.LevelIndex;
+        }
+
         public async Task LoadDataAsync()
         {
             IList<IResourceLocation> locations = await _assetProvider.LoadByLabel(_gameStaticData.LevelLabel.labelString, typeof(LevelStaticData));

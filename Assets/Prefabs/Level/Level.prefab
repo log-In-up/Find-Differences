@@ -131,6 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 433a28afcf549b94495ba7d63c337460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _findingEffect: {fileID: 1256001557233130, guid: fa340b717d088ce418d228c222c4ce46, type: 3}
   _layerMask:
     serializedVersion: 2
     m_Bits: 64

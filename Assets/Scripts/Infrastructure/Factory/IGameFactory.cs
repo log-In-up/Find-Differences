@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Infrastructure.Services;
 using Assets.Scripts.Infrastructure.Services.PersistentProgress;
+using Assets.Scripts.Logic;
 using Assets.Scripts.StaticData;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,6 +12,6 @@ namespace Assets.Scripts.Infrastructure.Factory
     {
         void CleanUp();
 
-        void SpawnGameLevel(uint index);
+        LevelHandler SpawnGameLevel(uint index);
     }
 }

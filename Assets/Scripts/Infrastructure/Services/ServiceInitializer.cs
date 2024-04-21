@@ -8,7 +8,6 @@ using Assets.Scripts.Infrastructure.Services.SaveLoad;
 using Assets.Scripts.Infrastructure.Services.StaticData;
 using Assets.Scripts.Infrastructure.States;
 using Assets.Scripts.StaticData;
-using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -16,11 +15,11 @@ namespace Assets.Scripts.Infrastructure.Services
 {
     public class ServiceInitializer
     {
-        private readonly ISceneLoader _sceneLoader;
         private readonly ICoroutineRunner _coroutineRunner;
+        private readonly GameStaticData _gameStaticData;
+        private readonly ISceneLoader _sceneLoader;
         private readonly ServiceLocator _serviceLocator;
         private readonly IGameStateMachine _stateMachine;
-        private readonly GameStaticData _gameStaticData;
 
         public ServiceInitializer(ServiceLocator serviceLocator,
             IGameStateMachine stateMachine,
@@ -38,21 +37,18 @@ namespace Assets.Scripts.Infrastructure.Services
 
         public async Task RegisterServicesAsync()
         {
+            IAssetProvider assetProvider = new AssetProvider();
+            await assetProvider.Initialize();
+            _serviceLocator.RegisterService(assetProvider);
+
             _serviceLocator.RegisterService(_sceneLoader);
             _serviceLocator.RegisterService(_stateMachine);
 
             await RegisterSaveLoadServiceAsync();
 
-            _serviceLocator.RegisterService<IIAPService>(new IAPService(
-                _serviceLocator.GetService<IPersistentProgressService>(),
-                _gameStaticData));
-
+            RegisterIAPService();
             RegisterAppodealService();
             RegisterLevelTimeService();
-
-            IAssetProvider assetProvider = new AssetProvider();
-            await assetProvider.Initialize();
-            _serviceLocator.RegisterService(assetProvider);
 
             IStaticDataService staticDataService = new StaticDataService(assetProvider, _gameStaticData);
             await staticDataService.LoadDataAsync();
@@ -61,20 +57,27 @@ namespace Assets.Scripts.Infrastructure.Services
             _serviceLocator.RegisterService<IGameFactory>(new GameFactory(assetProvider, staticDataService));
         }
 
-        private void RegisterLevelTimeService()
-        {
-            _serviceLocator.RegisterService<ITimer>(new LevelTimerService(
-                            _coroutineRunner,
-                            _serviceLocator.GetService<IPersistentProgressService>(),
-                            _gameStaticData));
-        }
-
         private void RegisterAppodealService()
         {
             IAppodealService appodealService = new AppodealService.AppodealService();
             appodealService.Initialize();
 
             _serviceLocator.RegisterService(appodealService);
+        }
+
+        private void RegisterIAPService()
+        {
+            _serviceLocator.RegisterService<IIAPService>(new IAPService(_gameStaticData,
+                            _serviceLocator.GetService<IPersistentProgressService>(),
+                            _serviceLocator.GetService<ISaveLoadService>()));
+        }
+
+        private void RegisterLevelTimeService()
+        {
+            _serviceLocator.RegisterService<ITimer>(new LevelTimerService(
+                            _coroutineRunner,
+                            _serviceLocator.GetService<IPersistentProgressService>(),
+                            _gameStaticData));
         }
 
         private async Task RegisterSaveLoadServiceAsync()

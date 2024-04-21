@@ -27,13 +27,15 @@ namespace Assets.Scripts.Infrastructure.Factory
             _assetProvider.CleanUp();
         }
 
-        public void SpawnGameLevel(uint index)
+        public LevelHandler SpawnGameLevel(uint index)
         {
             LevelStaticData levelHandler = _staticData.GetLevel(index);
             LevelHandler level = Object.Instantiate(levelHandler.LevelHandler);
 
             level.SetTopDifferences(levelHandler.TopImages);
             level.SetBottomDifferences(levelHandler.BottomImages);
+
+            return level;
         }
     }
 }
