@@ -1,9 +1,7 @@
 using Assets.Scripts.Infrastructure.Services.InputSystem;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEditor.Progress;
 
 namespace Assets.Scripts.Logic
 {
